@@ -103,7 +103,7 @@ Resources:
             Resource: 
               - !Join
                 - "/*"
-                - - !GetAtt DataPipelineRawBucket.Arn
+                - - !GetAtt datapipelinerawbucket.Arn
                   - ""
 
   S3DeleteScanStageObjectsPolicy:
@@ -118,7 +118,7 @@ Resources:
             Resource: 
               - !Join
                 - "/*"
-                - - !GetAtt DataPipelineScanStageBucket.Arn
+                - - !GetAtt datapipelinescanstagebucket.Arn
                   - ""
 
   S3DeleteManualReviewObjectsPolicy:
@@ -133,7 +133,7 @@ Resources:
             Resource: 
               - !Join
                 - "/*"
-                - - !GetAtt DataPipelineManualReviewBucket.Arn
+                - - !GetAtt datapipelinemanualreviewbucket.Arn
                   - ""
 
   S3TagObjectsPolicy:
@@ -149,19 +149,19 @@ Resources:
             Resource: 
               - !Join
                 - "/*"
-                - - !GetAtt DataPipelineScanStageBucket.Arn
+                - - !GetAtt datapipelinescanstagebucket.Arn
                   - ""
-              - !GetAtt DataPipelineScanStageBucket.Arn
+              - !GetAtt datapipelinescanstagebucket.Arn
               - !Join
                 - "/*"
-                - - !GetAtt DataPipelineScannedDataBucket.Arn
+                - - !GetAtt datapipelinescanneddatabucket.Arn
                   - ""
-              - !GetAtt DataPipelineScannedDataBucket.Arn
+              - !GetAtt datapipelinescanneddatabucket.Arn
               - !Join
                 - "/*"
-                - - !GetAtt DataPipelineManualReviewBucket.Arn
+                - - !GetAtt datapipelinemanualreviewbucket.Arn
                   - ""
-              - !GetAtt DataPipelineManualReviewBucket.Arn
+              - !GetAtt datapipelinemanualreviewbucket.Arn
   
   S3WriteObjectsPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -175,14 +175,14 @@ Resources:
             Resource: 
               - !Join
                 - "/*"
-                - - !GetAtt DataPipelineManualReviewBucket.Arn
+                - - !GetAtt datapipelinemanualreviewbucket.Arn
                   - ""
-              - !GetAtt DataPipelineManualReviewBucket.Arn
+              - !GetAtt datapipelinemanualreviewbucket.Arn
               - !Join
                 - "/*"
-                - - !GetAtt DataPipelineScannedDataBucket.Arn
+                - - !GetAtt datapipelinescanneddatabucket.Arn
                   - ""
-              - !GetAtt DataPipelineScannedDataBucket.Arn
+              - !GetAtt datapipelinescanneddatabucket.Arn
 
   StateMachineSendTaskPolicy:
     Type: AWS::IAM::ManagedPolicy
@@ -198,7 +198,7 @@ Resources:
                 stateMachine:${StepFunctionName}"
 
   # S3 Buckets Def
-  DataPipelineRawBucket:
+  datapipelinerawbucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${BucketNamePrefix}-data-pipeline-raw"
@@ -211,7 +211,7 @@ Resources:
           - ExpirationInDays: 10 
             Status: Enabled
 
-  DataPipelineScanStageBucket:
+  datapipelinescanstagebucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${BucketNamePrefix}-data-pipeline-scan-stage"
@@ -224,7 +224,7 @@ Resources:
           - ExpirationInDays: 10 
             Status: Enabled
 
-  DataPipelineManualReviewBucket:
+  datapipelinemanualreviewbucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${BucketNamePrefix}-data-pipeline-manual-review"
@@ -237,7 +237,7 @@ Resources:
           - ExpirationInDays: 10 
             Status: Enabled
 
-  DataPipelineScannedDataBucket:
+  datapipelinescanneddatabucket:
     Type: AWS::S3::Bucket
     Properties:
       BucketName: !Sub "${BucketNamePrefix}-data-pipeline-scanned-data"
@@ -267,8 +267,8 @@ Resources:
       CodeUri: functions/trigger_macie_scan/
       Environment:
         Variables:
-          rawS3Bucket: !Ref DataPipelineRawBucket
-          scanS3Bucket: !Ref DataPipelineScanStageBucket
+          rawS3Bucket: !Ref datapipelinerawbucket
+          scanS3Bucket: !Ref datapipelinescanstagebucket
           accountId: !Ref "AWS::AccountId"
       Handler: triggerMacieScan.lambda_handler
       Policies:
@@ -277,10 +277,10 @@ Resources:
         - !Ref S3TagObjectsPolicy
         - S3ReadPolicy:
             BucketName:
-              !Ref DataPipelineRawBucket
+              !Ref datapipelinerawbucket
         - S3WritePolicy:
             BucketName:
-              !Ref DataPipelineScanStageBucket
+              !Ref datapipelinescanstagebucket
       Runtime: python3.6
       Timeout: 10
 
@@ -300,7 +300,7 @@ Resources:
       CodeUri: functions/delete_manual_review_s3_files/
       Environment:
         Variables:
-          sourceS3Bucket: !Ref DataPipelineManualReviewBucket
+          sourceS3Bucket: !Ref datapipelinemanualreviewbucket
       Handler: deleteManualReviewS3Files.lambda_handler
       Policies:
         - !Ref S3DeleteManualReviewObjectsPolicy
@@ -316,13 +316,13 @@ Resources:
         - !Ref MacieStatusPolicy
         - S3ReadPolicy:
             BucketName:
-              !Ref DataPipelineScanStageBucket
+              !Ref datapipelinescanstagebucket
         - S3WritePolicy:
             BucketName:
-              !Ref DataPipelineScannedDataBucket
+              !Ref datapipelinescanneddatabucket
         - S3WritePolicy:
             BucketName:
-              !Ref DataPipelineManualReviewBucket
+              !Ref datapipelinemanualreviewbucket
       Runtime: python3.6
       Timeout: 10
 
@@ -332,16 +332,16 @@ Resources:
       CodeUri: functions/move_all_scan_stage_s3_files/
       Environment:
         Variables:
-          sourceS3Bucket: !Ref DataPipelineScanStageBucket
-          targetS3Bucket: !Ref DataPipelineScannedDataBucket
+          sourceS3Bucket: !Ref datapipelinescanstagebucket
+          targetS3Bucket: !Ref datapipelinescanneddatabucket
       Handler: moveAllScanStageS3Files.lambda_handler
       Policies:
         - S3ReadPolicy:
             BucketName:
-              !Ref DataPipelineScanStageBucket
+              !Ref datapipelinescanstagebucket
         - S3WritePolicy:
             BucketName:
-              !Ref DataPipelineScannedDataBucket
+              !Ref datapipelinescanneddatabucket
         - !Ref S3DeleteScanStageObjectsPolicy
         - !Ref S3TagObjectsPolicy
         - !Ref S3WriteObjectsPolicy
@@ -354,13 +354,13 @@ Resources:
       CodeUri: functions/move_to_scanned_data_s3_files/
       Environment:
         Variables:
-          sourceS3Bucket: !Ref DataPipelineManualReviewBucket
-          targetS3Bucket: !Ref DataPipelineScannedDataBucket
+          sourceS3Bucket: !Ref datapipelinemanualreviewbucket
+          targetS3Bucket: !Ref datapipelinescanneddatabucket
       Handler: moveToScannedDataS3Files.lambda_handler
       Policies:
         - S3ReadPolicy:
             BucketName:
-              !Ref DataPipelineManualReviewBucket
+              !Ref datapipelinemanualreviewbucket
         - !Ref S3TagObjectsPolicy
         - !Ref S3WriteObjectsPolicy
         - !Ref S3DeleteManualReviewObjectsPolicy
@@ -397,9 +397,9 @@ Resources:
           apiAllowEndpoint: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/allow"
           apiDenyEndpoint: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/deny"
           snsTopicArn: !Ref SNSApprovalTopic
-          sourceS3Bucket: !Ref DataPipelineScanStageBucket
-          targetS3Bucket: !Ref DataPipelineManualReviewBucket
-          targetScannedS3Bucket: !Ref DataPipelineScannedDataBucket
+          sourceS3Bucket: !Ref datapipelinescanstagebucket
+          targetS3Bucket: !Ref datapipelinemanualreviewbucket
+          targetScannedS3Bucket: !Ref datapipelinescanneddatabucket
       Handler: triggerManualApproval.lambda_handler
       Policies:
         - SNSPublishMessagePolicy:
@@ -407,7 +407,7 @@ Resources:
               !GetAtt SNSApprovalTopic.TopicName
         - S3ReadPolicy:
             BucketName:
-              !Ref DataPipelineScanStageBucket
+              !Ref datapipelinescanstagebucket
         - !Ref S3DeleteScanStageObjectsPolicy
         - !Ref S3TagObjectsPolicy
         - !Ref S3WriteObjectsPolicy
@@ -514,11 +514,11 @@ Outputs:
     Description: "Macie Scan Step Function ARN"
     Value: !Ref MaciePipelineScanStateMachine
   
-  DataPipelineRawBucketName:
+  datapipelinerawbucketname:
     Description: "Data pipeline raw bucket name to trigger Macie scan"
-    Value: !Ref DataPipelineRawBucket
+    Value: !Ref datapipelinerawbucket
 
-  DataPipelineScannedDataBucketName:
+  datapipelinescanneddatabucketname:
     Description: "Data pipeline bucket post Macie scan"
-    Value: !Ref DataPipelineScannedDataBucket
+    Value: !Ref datapipelinescanneddatabucket
 
