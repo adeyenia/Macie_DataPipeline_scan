@@ -281,7 +281,7 @@ Resources:
         - S3WritePolicy:
             BucketName:
               !Ref datapipelinescanstagebucket
-      Runtime: python3.9
+      Runtime: python3.8
       Timeout: 10
 
   CheckMacieStatus:
@@ -291,7 +291,7 @@ Resources:
       Handler: checkMacieStatus.lambda_handler
       Policies:
         - !Ref MacieStatusPolicy
-      Runtime: python3.9
+      Runtime: python3.8
       Timeout: 10
 
   DeleteManualReviewS3Files:
@@ -304,7 +304,7 @@ Resources:
       Handler: deleteManualReviewS3Files.lambda_handler
       Policies:
         - !Ref S3DeleteManualReviewObjectsPolicy
-      Runtime: python3.9
+      Runtime: python3.8
       Timeout: 10
 
   GetMacieFindingsCount:
@@ -323,7 +323,7 @@ Resources:
         - S3WritePolicy:
             BucketName:
               !Ref datapipelinemanualreviewbucket
-      Runtime: python3.9
+      Runtime: python3.8
       Timeout: 10
 
   MoveAllScanStageS3Files:
@@ -345,7 +345,7 @@ Resources:
         - !Ref S3DeleteScanStageObjectsPolicy
         - !Ref S3TagObjectsPolicy
         - !Ref S3WriteObjectsPolicy
-      Runtime: python3.9
+      Runtime: python3.8
       Timeout: 10
 
   MoveToScannedDataS3Files:
@@ -364,7 +364,7 @@ Resources:
         - !Ref S3TagObjectsPolicy
         - !Ref S3WriteObjectsPolicy
         - !Ref S3DeleteManualReviewObjectsPolicy
-      Runtime: python3.9
+      Runtime: python3.8
       Timeout: 10
 
   ReceiveApprovalDecisionAPI:
@@ -374,7 +374,7 @@ Resources:
       Handler: receiveApprovalDecisionAPI.lambda_handler
       Policies:
         - !Ref StateMachineSendTaskPolicy
-      Runtime: python3.9
+      Runtime: python3.8
       Events:
         ApiEventAllow:
           Type: Api
