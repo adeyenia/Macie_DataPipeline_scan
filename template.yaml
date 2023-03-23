@@ -291,7 +291,7 @@ Resources:
       Handler: checkMacieStatus.lambda_handler
       Policies:
         - !Ref MacieStatusPolicy
-      Runtime: python3.6
+      Runtime: python3.9
       Timeout: 10
 
   DeleteManualReviewS3Files:
